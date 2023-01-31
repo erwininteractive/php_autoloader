@@ -11,11 +11,10 @@ Autoload::init()->loadClasses();
 
 class Autoload
 {
-    private static ?autoload $instance = null;
+    private static ?Autoload $instance = null;
     private static array $namespaces = [];
 
-    private function __construct()
-    {
+    private function __construct() {
         /**
          * Set up your name spaces like this:
          * 'Namespace\\' => ['physical directory'],
@@ -28,38 +27,30 @@ class Autoload
         ];
     }
 
-    public static function init(): self
-    {
-        if (self::$instance === null)
-        {
+    public static function init(): self {
+        if (self::$instance === null) {
             self::$instance = new Autoload;
         }
 
         return self::$instance;
     }
 
-    public static function loadClasses()
-    {
+    public static function loadClasses(): void {
         spl_autoload_register('self::load');
     }
 
-    private static function load(string $ns): bool
-    {
+    private static function load(string $ns): bool {
         $namespace = $ns;
 
-        while ($pos = strrpos($namespace, '\\')) 
-        {
+        while ($pos = strrpos($namespace, '\\')) {
             $namespace = substr($ns, 0, $pos + 1);
             $class = substr($ns, $pos + 1);
             
-            if (isset(self::$namespaces[$namespace]))
-            {
-                foreach (self::$namespaces[$namespace] as $dir) 
-                {
+            if (isset(self::$namespaces[$namespace])) {
+                foreach (self::$namespaces[$namespace] as $dir) {
                     $file = $dir.str_replace('\\', '/', $class).'.php';
         
-                    if (file_exists($file))
-                    {
+                    if (file_exists($file)) {
                         require($file);
                         return true;
                     }
